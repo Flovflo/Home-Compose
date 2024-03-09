@@ -1,0 +1,361 @@
+esphome:
+  name: linky
+  friendly_name: linky
+  platform: ESP8266
+  board: nodemcuv2
+
+# Enable logging
+logger:
+  level: debug
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_linky
+
+ota:
+  password: !secret ota_linky
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Linky Fallback Hotspot"
+    password: "5hY5nfJvbKc2"
+
+captive_portal:
+
+time:
+  - platform: sntp
+    id: sntp_time
+    servers: "pool.ntp.org"  # Vous pouvez utiliser un autre serveur NTP si vous le souhaitez
+    timezone: "Europe/Paris"  
+
+
+uart:
+  id: uart_bus
+  rx_pin: GPIO3
+  baud_rate: 9600
+  parity: EVEN
+  data_bits: 7
+
+
+teleinfo:
+  id: esp_teleinfo
+  update_interval: 60s
+  historical_mode: false
+
+
+binary_sensor:
+  - platform: status
+    id: teleinfo_status
+    name: "Teleinfo Status"
+
+
+sensor:
+  - platform: wifi_signal
+    name: "Signal wifi"
+    update_interval: 60s
+    unit_of_measurement: dB
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:wifi
+   
+  - platform: uptime
+    id: uptime_seconds
+    name: "Uptime Sensor"
+    update_interval: 60s
+    unit_of_measurement: s
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:timer
+   
+  #-------------------------
+  # MODE STANDARD
+  #-------------------------
+  # Énergie active soutirée totale
+  - platform: teleinfo
+    tag_name: "EAST"
+    id: linky_energie_soutiree
+    name: "Linky Energie Soutirée"
+    unit_of_measurement: "kWh"
+    device_class: "energy"
+    state_class: "total_increasing"
+    accuracy_decimals: 3 
+    filters:
+      - multiply: 0.001
+    icon: mdi:gauge
+    
+  # Energie active soutirée Fournisseur, index 01
+  - platform: teleinfo
+    tag_name: "EASF01"
+    name: "Linky Energie Soutirée Heures Creuses"
+    unit_of_measurement: "kWh"
+    device_class: "energy"
+    state_class: "total_increasing"
+    accuracy_decimals: 3 
+    filters:
+      - multiply: 0.001
+    icon: mdi:gauge
+
+
+  # Energie active soutirée Fournisseur, index 02
+  - platform: teleinfo
+    tag_name: "EASF02"
+    name: "Linky Energie Soutirée Heures Pleines"
+    unit_of_measurement: "kWh"
+    device_class: "energy"
+    state_class: "total_increasing"
+    accuracy_decimals: 3 
+    filters:
+      - multiply: 0.001
+    icon: mdi:gauge
+    
+    # Numero du Tarif en cours
+  - platform: teleinfo
+    id: ntarif
+    tag_name: "NTARF"
+    name: "linky N Tarif"
+    unit_of_measurement: ""
+    icon: mdi:flash
+
+  # Puissance app. Instantanée Soutirée
+  - platform: teleinfo
+    tag_name: "SINSTS"
+    name: "Linky Puissance Apparente Instantanée Soutirée"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. max. soutirée
+  - platform: teleinfo
+    tag_name: "SMAXSN"
+    name: "Linky Puissance Apparente Maximale Soutirée"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Point n de la courbe de charge active soutirée
+  - platform: teleinfo
+    tag_name: "CCASN"
+    name: "Linky Puissance Active Soutirée"
+    unit_of_measurement: W
+    state_class: measurement
+    device_class: power
+    
+  #-------------------------
+  #MODE STANDARD - TRIPHASÉ
+  #-------------------------
+
+  # Courant Efficace, phase 2
+  - platform: teleinfo
+    tag_name: "IRMS2"
+    name: "Linky Courant Efficace Phase 2"
+    unit_of_measurement: A
+    device_class: current
+    state_class: measurement
+
+  # Courant Efficace, phase 3
+  - platform: teleinfo
+    tag_name: "IRMS3"
+    name: "Linky Courant Efficace Phase 3"
+    unit_of_measurement: A
+    device_class: current
+    state_class: measurement
+
+  # Tension Efficace, phase 2
+  - platform: teleinfo
+    tag_name: "URMS2"
+    name: "Linky Tension Efficace Phase 2"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+
+  # Tension Efficace, phase 3
+  - platform: teleinfo
+    tag_name: "URMS3"
+    name: "Linky Tension Efficace Phase 3"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+
+  # Puissance app. Instantanée Soutirée, phase 1
+  - platform: teleinfo
+    tag_name: "SINSTS1"
+    name: "Linky Puissance Apparente Instantanée Soutirée Phase 1"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. Instantanée Soutirée, phase 2
+  - platform: teleinfo
+    tag_name: "SINSTS2"
+    name: "Linky Puissance Apparente Instantanée Soutirée Phase 2"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. Instantanée Soutirée, phase 3
+  - platform: teleinfo
+    tag_name: "SINSTS3"
+    name: "Linky Puissance Apparente Instantanée Soutirée Phase 3"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. max. Soutirée, phase 1
+  - platform: teleinfo
+    tag_name: "SMAXSN1"
+    name: "Linky Puissance Apparente Maximale Soutirée Phase 1"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. max. Soutirée, phase 2
+  - platform: teleinfo
+    tag_name: "SMAXSN2"
+    name: "Linky Puissance Apparente Maximale Soutirée Phase 2"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Puissance app. max. Soutirée, phase 3
+  - platform: teleinfo
+    tag_name: "SMAXSN3"
+    name: "Linky Puissance Apparente Maximale Soutirée Phase 3"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+  # Tension Moyenne, phase 2
+  - platform: teleinfo
+    tag_name: "UMOY2"
+    name: "Linky Tension Moyenne Phase 2"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+
+  # Tension Moyenne, phase 3
+  - platform: teleinfo
+    tag_name: "UMOY3"
+    name: "Linky Tension Moyenne Phase 3"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+
+
+  #-------------------------
+  # PRODUCTEURS
+  #-------------------------
+
+  - platform: teleinfo
+    tag_name: "EAIT"
+    id: linky_energie_injectee
+    name: "Linky Energie Injectée"
+    unit_of_measurement: "kWh"
+    device_class: "energy"
+    state_class: "total_increasing"
+    accuracy_decimals: 3 
+    filters:
+      - multiply: 0.001
+    icon: mdi:gauge
+
+  - platform: teleinfo
+    tag_name: "SINSTI"
+    name: "Linky Puissance Apparente Instantanée Injectée"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+ # Puissance app. Maximale Injectée
+  - platform: teleinfo
+    tag_name: "SMAXIN"
+    name: "Linky Puissance Apparente Maximale Injectée"
+    unit_of_measurement: VA
+    state_class: measurement
+    device_class: apparent_power
+
+ # Point n de la courbe de charge active injectée
+  - platform: teleinfo
+    tag_name: "CCAIN"
+    name: "Linky Puissance Active Injectée"
+    unit_of_measurement: W
+    state_class: measurement
+    device_class: power
+
+ # Point n-1 de la courbe de charge active injectée
+  - platform: teleinfo
+    tag_name: "CCAIN-1"
+    name: "Linky Puissance Active Injectée N-1"
+    unit_of_measurement: W
+    state_class: measurement
+    device_class: power
+
+    # Capteur pour l'énergie totale soutirée
+  - platform: total_daily_energy
+    name: "Energie Soutirée Quotidienne"
+    power_id: linky_energie_soutiree  # Assurez-vous que cela correspond à l'ID de votre capteur de consommation totale
+    unit_of_measurement: kWh
+    device_class: energy
+    icon: mdi:flash
+    accuracy_decimals: 3
+    filters:
+     - multiply: 0.001
+
+  # Capteur pour l'énergie totale injectée
+  - platform: total_daily_energy
+    name: "Energie Injectée Quotidienne"
+    power_id: linky_energie_injectee  # Assurez-vous que cela correspond à l'ID de votre capteur d'injection totale
+    unit_of_measurement: kWh
+    device_class: energy
+    icon: mdi:flash
+    accuracy_decimals: 3
+    filters:
+     - multiply: 0.001
+
+
+
+
+button:
+  - platform: restart
+    name: "Teleinfo Restart"
+
+
+text_sensor:
+  - platform: teleinfo
+    tag_name: "PTEC"
+    name: "Tarif actuel"
+    icon: mdi:clock-time-nine-outline
+  - platform: template
+    name: Uptime
+    update_interval: 60s
+    icon: mdi:clock-start
+    lambda: |-
+      int seconds = (id(uptime_seconds).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }      
+  - platform: template
+    id: tarif
+    name: "Linky PTEC"
+    lambda: |-
+      if ( id(ntarif).state == 1 ) {
+        return { "HC.." };
+      } else {
+        return { "HP.." };
+      }
