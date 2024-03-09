@@ -1,0 +1,25 @@
+alias: Contrôle lumière avec détection de présence
+trigger:
+  - platform: state
+    entity_id: binary_sensor.s2_detect_presence
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.s2_detect_presence
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.yeelight_color_0x7ce97fe
+            data:
+              brightness_pct: 100
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.s2_detect_presence
+            state: "off"
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: light.yeelight_color_0x7ce97fe
+            data: {}
