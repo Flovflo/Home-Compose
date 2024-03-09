@@ -1,0 +1,38 @@
+alias: Prise 5 Contrôle Automatique
+description: >-
+  Allume l'appareil sur la prise 5 en fonction de la puissance injectée
+  supérieure à 1000W et lorsque le radiateur (sur la prise 4) est en marche.
+  Éteint l'appareil dès que la consommation sur le réseau est supérieure à 200W.
+  Envoie une notification lors de l'allumage et de l'extinction de l'appareil.
+trigger:
+  - platform: time_pattern
+    minutes: /15
+action:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.linky_puissance_apparente_instantanee_injectee
+            above: 1000
+          - condition: state
+            entity_id: switch.prise_4
+            state: "on"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.prise_5
+            data: {}
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.linky_puissance_apparente_instantanee_soutiree
+                above: 200
+              - condition: state
+                entity_id: switch.prise_4
+                state: "off"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.prise_5
+            data: {}
+mode: single
