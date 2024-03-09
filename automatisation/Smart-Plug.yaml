@@ -1,0 +1,39 @@
+alias: Prise 4 Contrôle Automatique du Radiateur
+description: >-
+  Allume le radiateur (sur la prise 4) en fonction de la puissance injectée
+  supérieure à 1000W et lorsque le chauffe-eau (sur la prise 3) est en marche.
+  Éteint le radiateur dès que la consommation sur le réseau est supérieure à
+  200W. Envoie une notification lors de l'allumage et de l'extinction du
+  radiateur.
+trigger:
+  - platform: time_pattern
+    minutes: /10
+action:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.linky_puissance_apparente_instantanee_injectee
+            above: 1000
+          - condition: state
+            entity_id: switch.chauffe_eau_solaire
+            state: "on"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.prise_4
+            data: {}
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.linky_puissance_apparente_instantanee_soutiree
+                above: 200
+              - condition: state
+                entity_id: switch.chauffe_eau_solaire
+                state: "off"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.prise_4
+            data: {}
+mode: single
