@@ -86,7 +86,10 @@ sensor:
     state_class: "total_increasing"
     accuracy_decimals: 3 
     filters:
-      - multiply: 0.001
+    - multiply: 0.001
+    - lambda: |-
+        if (x <= 0.0) return {};
+        else return x;
     icon: mdi:gauge
     
   # Energie active soutirée Fournisseur, index 01
@@ -98,9 +101,11 @@ sensor:
     state_class: "total_increasing"
     accuracy_decimals: 3 
     filters:
-      - multiply: 0.001
+    - multiply: 0.001
+    - lambda: |-
+        if (x <= 0.0) return {}; // Ne retourne rien si x <= 0
+        else return x;
     icon: mdi:gauge
-
 
   # Energie active soutirée Fournisseur, index 02
   - platform: teleinfo
@@ -111,7 +116,10 @@ sensor:
     state_class: "total_increasing"
     accuracy_decimals: 3 
     filters:
-      - multiply: 0.001
+    - multiply: 0.001
+    - lambda: |-
+        if (x <= 0.0) return {}; // Ne retourne rien si x <= 0
+        else return x;
     icon: mdi:gauge
     
     # Numero du Tarif en cours
@@ -129,6 +137,7 @@ sensor:
     unit_of_measurement: VA
     state_class: measurement
     device_class: apparent_power
+    id: linky_puissance_soutiree
 
   # Puissance app. max. soutirée
   - platform: teleinfo
@@ -150,6 +159,14 @@ sensor:
   #MODE STANDARD - TRIPHASÉ
   #-------------------------
 
+  # Courant Efficace, phase 1
+  - platform: teleinfo
+    tag_name: "IRMS1"
+    name: "Linky Courant Efficace Phase 1"
+    unit_of_measurement: A
+    device_class: current
+    state_class: measurement
+
   # Courant Efficace, phase 2
   - platform: teleinfo
     tag_name: "IRMS2"
@@ -164,6 +181,14 @@ sensor:
     name: "Linky Courant Efficace Phase 3"
     unit_of_measurement: A
     device_class: current
+    state_class: measurement
+
+    # Tension Efficace, phase 1
+  - platform: teleinfo
+    tag_name: "URMS1"
+    name: "Linky Tension Efficace Phase 1"
+    unit_of_measurement: V
+    device_class: voltage
     state_class: measurement
 
   # Tension Efficace, phase 2
@@ -232,6 +257,14 @@ sensor:
 
   # Tension Moyenne, phase 2
   - platform: teleinfo
+    tag_name: "UMOY1"
+    name: "Linky Tension Moyenne Phase 1"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+
+  # Tension Moyenne, phase 2
+  - platform: teleinfo
     tag_name: "UMOY2"
     name: "Linky Tension Moyenne Phase 2"
     unit_of_measurement: V
@@ -260,7 +293,10 @@ sensor:
     state_class: "total_increasing"
     accuracy_decimals: 3 
     filters:
-      - multiply: 0.001
+    - multiply: 0.001
+    - lambda: |-
+        if (x <= 0.0) return {};
+        else return x;
     icon: mdi:gauge
 
   - platform: teleinfo
@@ -269,6 +305,7 @@ sensor:
     unit_of_measurement: VA
     state_class: measurement
     device_class: apparent_power
+    id: linky_puissance_injectee
 
  # Puissance app. Maximale Injectée
   - platform: teleinfo
@@ -294,29 +331,23 @@ sensor:
     state_class: measurement
     device_class: power
 
-    # Capteur pour l'énergie totale soutirée
+# Capteur pour l'énergie totale soutirée quotidienne
   - platform: total_daily_energy
     name: "Energie Soutirée Quotidienne"
-    power_id: linky_energie_soutiree  # Assurez-vous que cela correspond à l'ID de votre capteur de consommation totale
+    power_id: linky_puissance_soutiree  
     unit_of_measurement: kWh
     device_class: energy
     icon: mdi:flash
     accuracy_decimals: 3
-    filters:
-     - multiply: 0.001
 
-  # Capteur pour l'énergie totale injectée
+  # Capteur pour l'énergie totale injectée quotidienne
   - platform: total_daily_energy
     name: "Energie Injectée Quotidienne"
-    power_id: linky_energie_injectee  # Assurez-vous que cela correspond à l'ID de votre capteur d'injection totale
+    power_id: linky_puissance_injectee  
     unit_of_measurement: kWh
     device_class: energy
     icon: mdi:flash
     accuracy_decimals: 3
-    filters:
-     - multiply: 0.001
-
-
 
 
 button:
