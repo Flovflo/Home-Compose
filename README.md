@@ -7,6 +7,8 @@ Ce dépôt contient mes fichiers de configuration pour divers projets Home Assis
 Dans le dossier `ESP`, vous trouverez les configurations nécessaires à deux projets distincts :
 
 1. **Projet Linky en triphasé avec production solaire** : Configuration pour récupérer des informations depuis un compteur Linky via un ESP, spécifiquement adaptée pour un système en triphasé et avec production d'énergie. Ce projet permet une surveillance précise de la consommation et de la production d'énergie.
+   ![Dessin sans titre](https://github.com/Flovflo/Home-Compose/assets/86321847/9f77e768-4ed2-41b6-a4af-5c379ecb825c)
+
 
 3. **Projet de détection de présence** : Utilisant un ESP32-S2 Mini et un capteur de présence LD410C, cette configuration s'inspire d'une vidéo des frères Poulain. Elle est améliorée par l'ajout d'un capteur de luminosité pour activer l'éclairage uniquement lorsque c'est nécessaire, optimisant ainsi la consommation d'énergie.
 
