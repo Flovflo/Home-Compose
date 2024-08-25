@@ -1,0 +1,35 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - ./data/mosquitto:/mosquitto
+      - ./data/mosquitto/data:/mosquitto/data
+      - ./data/mosquitto/log:/mosquitto/log
+      - ./data/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - 1883:1883
+      - 9001:9001
+
+  frigate:
+    container_name: frigate
+    image: ghcr.io/blakeblackshear/frigate:0.14.0-standard-arm64
+    privileged: true
+    restart: unless-stopped
+    shm_size: "500mb"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data/frigate/config/config.yml:/config/config.yml
+      - /Volumes/Fat_Boy/Frigate/storage:/media/frigate
+      - type: tmpfs
+        target: /tmp/frigate
+        tmpfs:
+          size: 1000000000 # 1GB de mémoire
+    ports:
+      - "80:5000"
+      - "443:8971"
+      - "1935:1935" # RTMP feeds
+      - "8554:8554" # RTSP feeds
+    environment:
+      FRIGATE_RTSP_PASSWORD: $mdp-rtsp
