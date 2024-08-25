@@ -1,57 +1,56 @@
-version: '3'
 services:
   homeassistant:
     container_name: homeassistant
-    image: "ghcr.io/home-assistant/home-assistant:stable"
+    image: "ghcr.io/home-assistant/home-assistant:latest"
     volumes:
       - "./data/HA:/config"
       - "/etc/localtime:/etc/localtime:ro"
       - "/run/dbus:/run/dbus:ro"
     restart: unless-stopped
     privileged: true
-    networks:
-      - homeassistant_network
-    ports:
-      - 8123:8123
-      - 1900:1900
-      - 5350:5350
-      - 5351:5351
-      - 51829:51829
-      - 21064:21064
-      - 51827:51827
-      - 21064:21064
+    network_mode: host
 
   esphome:
-      container_name: esphome
-      image: esphome/esphome:latest
-      volumes:
-        - "./data/esphome_data:/config" 
-      networks:
-       - homeassistant_network
-      ports:
-        - "6052:6052"  
-        - "6123:6123"  
-      restart: unless-stopped
+    container_name: esphome
+    image: esphome/esphome:latest
+    volumes:
+      - "./data/esphome_data:/config"
+    restart: unless-stopped
+    network_mode: host
 
   cloudflared:
     container_name: cloudflared
     image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run --token 
+    command: tunnel --no-autoupdate run --token $cloudflared-token
     restart: unless-stopped
-    networks:
-      - homeassistant_network
-
+    network_mode: host
 
   watchtower:
     container_name: watchtower
-    image: containrrr/watchtower
+    image: containrrr/watchtower:latest
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-    command: --schedule "0 0 4 * * *" homeassistant # Mise à jour quotidienne à 4h00
+    command: --schedule "0 0 4 * * *"
     restart: unless-stopped
-    networks:
-      - homeassistant_network
+    network_mode: host
+  
+  scrypted:
+    container_name: scrypted
+    image: koush/scrypted
+    privileged: true
+    restart: unless-stopped
+    volumes:
+      - "./data/scrypted:/server/volume"
+    network_mode: host
 
-networks:
-  homeassistant_network:
-    external: true
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    network_mode: host
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - ./data/matter:/data
+      - /run/dbus:/run/dbus:ro
+  
