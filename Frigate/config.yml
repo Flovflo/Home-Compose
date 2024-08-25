@@ -1,0 +1,41 @@
+mqtt:
+  host: mosquitto.frigate.orb.local
+  user: $usermqtt
+  password: $mdpmqtt
+tls:
+  enabled: true
+
+cameras:
+  Camera:
+    ffmpeg:
+      inputs:
+        - path: rtsp://$userrtsp:$mdprtsp@192.168.0.100:554/stream1
+          roles:
+            - detect
+            - record
+    objects:
+      track:
+        - person
+        - car
+        - dog
+        - cat
+    detect:
+      width: 1920
+      height: 1080
+      fps: 2
+    record:
+      enabled: false
+
+    zones:
+      entree:
+        coordinates: 
+          0.108,0.1,0.125,0.236,0.373,0.183,0.373,0.032,0.489,0.011,0.496,0.13,0.526,0.125,0.533,0.038,0.551,0.038,0.551,0.005,0.877,0.01,0.999,0.091,0.999,0.993,0.003,0.993,0.002,0.203,0.007,0.165,0.082,0.093
+        loitering_time: 0
+    motion:
+      mask: 
+        0.086,0.088,0.113,0.088,0.126,0.229,0.239,0.201,0.361,0.172,0.374,0.169,0.368,0.026,0.484,0,0.496,0.12,0.525,0.121,0.53,0.036,0.552,0.033,0.546,0.008,0.88,0.004,0.909,0.004,0.924,0.02,0.998,0.078,1,1,0,1,0,0.171
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 6
+version: 0.14
