@@ -122,10 +122,3 @@ Contributions, issues, and suggestions are welcome!
 - Open an **issue** for bugs or feature requests
 - Submit a **PR** to share your use case
 
----
-
-### Q1: Which device would you prioritize to further boost energy savings?
-### Q2: Have you considered adding automations based on local weather data?
-### Q3: Which metric (power, current, voltage) is most critical for you to monitor in real time?
-```
-
