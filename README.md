@@ -1,4 +1,4 @@
-# 🏡 flovflo-home-compose: Intelligent and Eco-Friendly Home Management
+# 🏡 Home-Flo-compose: Intelligent and Eco-Friendly Home Management
 
 Welcome to **flovflo-home-compose**, your one-stop solution for a connected, adaptable, and energy-optimized home. Leveraging Home Assistant, ESPHome, Docker, and Frigate, this project walks you through building a powerful domotics ecosystem centered on solar energy management.
 
